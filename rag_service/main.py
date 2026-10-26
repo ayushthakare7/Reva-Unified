@@ -365,6 +365,15 @@ class RevaRAGHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def do_HEAD(self):
+        # Render and other health probes may issue HEAD requests.
+        # Respond without a body; the regular GET /health endpoint remains authoritative.
+        path = urlparse(self.path).path.rstrip("/") or "/"
+        self.send_response(200 if path in {"/", "/health"} else 404)
+        self.send_header("Content-Length", "0")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+
     def do_GET(self):
         path = urlparse(self.path).path.rstrip("/") or "/"
         if path == "/":
