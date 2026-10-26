@@ -3,7 +3,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-venv supervisor ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 COPY mobility-service/package.json ./mobility-service/package.json
 RUN cd mobility-service && npm install --omit=dev
 COPY rag_service/requirements.txt ./rag_service/requirements.txt
