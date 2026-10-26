@@ -17,6 +17,8 @@ services:
         sync: false
       - key: RAG_SERVICE_TOKEN
         sync: false
+      - key: RAG_VECTOR_INDEX
+        value: location_event_vector_index_384
       - key: GROQ_API_KEY
         sync: false
       - key: ORS_API_KEY
