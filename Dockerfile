@@ -4,6 +4,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-venv supervisor ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY package*.json ./
 RUN npm install --omit=dev
+# Build browser bundles used by the existing frontend, then remove build-only dependencies.
+RUN npm install --no-save esbuild && npm run mobile:build && npm run mobile:push-build && npm prune --omit=dev
 COPY mobility-service/package.json ./mobility-service/package.json
 RUN cd mobility-service && npm install --omit=dev
 COPY rag_service/requirements.txt ./rag_service/requirements.txt
