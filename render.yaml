@@ -25,3 +25,5 @@ services:
         sync: false
       - key: MOBILITY_CALLBACK_SECRET
         sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
