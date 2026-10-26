@@ -10,6 +10,10 @@ COPY rag_service/requirements.txt ./rag_service/requirements.txt
 RUN python3 -m venv /opt/reva-venv && /opt/reva-venv/bin/pip install --no-cache-dir --upgrade pip && /opt/reva-venv/bin/pip install --no-cache-dir -r rag_service/requirements.txt
 COPY . .
 
+# Download and validate the FastEmbed model during image build so the first
+# user question does not have to download model files on a cold start.
+RUN /opt/reva-venv/bin/python -c "from fastembed import TextEmbedding; model = TextEmbedding(model_name='sentence-transformers/all-MiniLM-L6-v2'); vector = next(model.query_embed('Reva startup warmup')); assert len(vector) == 384, f'Expected 384 dimensions, got {len(vector)}'; print('FastEmbed model cached and validated: 384 dimensions')"
+
 # Build frontend bundles after source files have been copied into the image.
 RUN npm install --no-save esbuild && npm run mobile:build && npm run mobile:push-build && npm prune --omit=dev
 RUN cp /app/deploy/supervisord.conf /etc/supervisor/conf.d/reva.conf && chmod +x /app/start-services.sh
