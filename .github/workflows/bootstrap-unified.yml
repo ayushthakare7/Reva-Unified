@@ -79,7 +79,7 @@ jobs:
           stdout_logfile_maxbytes=0
           stderr_logfile=/dev/fd/2
           stderr_logfile_maxbytes=0
-          environment=PORT="3101",MONGODB_URI="%(ENV_MONGO_URI)s"
+          environment=PORT="3101",MONGODB_URI="%(ENV_MONGO_URI)s",MAIN_APP_INTERNAL_URL="http://127.0.0.1:10000/api/internal/mobility-events"
 
           [program:main]
           command=node /app/server.js
