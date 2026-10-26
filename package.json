@@ -1,0 +1,47 @@
+{
+  "name": "proper-real-time-location-tracker",
+  "version": "1.0.0",
+  "description": "Privacy-aware real-time friend location tracker with Reva RAG assistant",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "rag:setup": "node scripts/setup-rag.js",
+    "history:regeocode": "node scripts/regeocode-history.js",
+    "test": "node --test",
+    "rag:start": "python rag_service/main.py",
+    "mobile:build": "esbuild src/public/js/reva-native-background.entry.ts --bundle --format=iife --target=es2020 --outfile=src/public/js/reva-native-background.js",
+    "mobile:push-build": "esbuild src/public/js/reva-push-notifications.entry.ts --bundle --format=iife --target=es2020 --outfile=src/public/js/reva-push-notifications.js",
+    "mobile:sync": "npm run mobile:build && npm run mobile:push-build && cap sync android",
+    "mobile:android": "cap open android"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.3.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.2",
+    "morgan": "^1.11.0",
+    "nodemailer": "^9.0.3",
+    "resend": "^6.16.0",
+    "socket.io": "^4.8.3",
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor-community/background-geolocation": "^1.2.25",
+    "@capacitor/local-notifications": "^7.0.3",
+    "@capacitor/screen-orientation": "^7.0.0",
+    "@capacitor/push-notifications": "^7.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "@capacitor/cli": "^7.4.3",
+    "esbuild": "^0.25.0"
+  }
+}

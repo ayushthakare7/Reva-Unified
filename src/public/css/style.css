@@ -1,0 +1,1442 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  color-scheme: light;
+  --canvas: #f6f6f2;
+  --surface: #fffefa;
+  --ink: #24332f;
+  --muted: #78847d;
+  --line: #e7e9e1;
+  --sage: #dce9dd;
+  --sage-strong: #527765;
+  --sage-dark: #315748;
+  --lavender: #efedf7;
+  --shadow: 0 16px 48px rgba(42, 59, 48, .055);
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; width: 100%; margin: 0; padding: 0; }
+body { background: var(--canvas); color: var(--ink); font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; transition: transform .18s ease, background .18s ease, box-shadow .18s ease; }
+button:active { transform: translateY(1px); }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(91, 131, 108, .24); outline-offset: 2px; }
+.app-header { min-height: 78px; padding: 14px clamp(18px, 5vw, 72px); display: flex; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 1px solid rgba(223, 227, 217, .8); background: rgba(255, 254, 250, .88); }
+.wordmark { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+.wordmark-mark { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 15px; background: var(--sage); color: var(--sage-dark); font: 800 27px/1 'Manrope', sans-serif; }
+.wordmark strong { display: block; font: 800 21px/1.1 'Manrope', sans-serif; letter-spacing: -.8px; }
+.wordmark small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; letter-spacing: .1px; }
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.gps-pill, .privacy-note, .map-caption { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.gps-pill { padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+.status-dot { width: 7px; height: 7px; display: inline-block; border-radius: 50%; background: #9eb5a4; flex: 0 0 auto; }
+.logout-button, .secondary { background: #f0f2ec; color: #52635a; border: 1px solid #e6e9e1; }
+.logout-button { border-radius: 999px; padding: 9px 15px; }
+.page-intro { max-width: 1440px; margin: 0 auto; padding: 42px clamp(18px, 5vw, 72px) 28px; display: flex; justify-content: space-between; align-items: end; gap: 20px; }
+.eyebrow { margin: 0 0 6px; color: #8b9b8e; font-size: 10px; font-weight: 700; letter-spacing: 1.7px; text-transform: uppercase; }
+.page-intro h1 { margin: 0; font: 600 clamp(28px, 4vw, 42px)/1.2 'Manrope', sans-serif; letter-spacing: -1.5px; }
+.page-intro h1 em { color: #6f917b; font-style: normal; }
+.intro-copy { margin: 10px 0 0; max-width: 570px; color: var(--muted); font-size: 14px; }
+.privacy-note { padding: 9px 13px; border-radius: 999px; background: #e9efe7; color: #597360; white-space: nowrap; }
+.privacy-note span { font-size: 17px; }
+.dashboard-grid { max-width: 1440px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 72px) 48px; display: grid; grid-template-columns: minmax(270px, 330px) minmax(0, 1fr); gap: 22px; align-items: start; }
+.dashboard-grid aside { min-width: 0; }
+.panel { padding: 21px; margin: 0 0 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); }
+.section-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+.section-heading h2, .map-heading h2 { margin: 0; font: 700 16px/1.3 'Manrope', sans-serif; letter-spacing: -.25px; }
+.section-heading .eyebrow, .map-heading .eyebrow { margin-bottom: 3px; }
+.section-icon { display: grid; place-items: center; width: 39px; height: 39px; flex: 0 0 39px; border-radius: 13px; background: #edf2e9; color: #66816d; font-size: 21px; }
+.friends-panel .section-icon { background: #f2eef7; color: #8877a0; }
+.privacy-panel .section-icon { background: #f7f0e5; color: #a1885d; }
+.panel h3 { font: 700 16px/1.35 'Manrope', sans-serif; }
+.muted { color: var(--muted); font-size: 12px; }
+.sharing-panel > p { margin: 0 0 15px; line-height: 1.7; }
+#start, #stop, #friendForm button, #deleteHistory, #askForm button[type=submit], .friends-panel button { border: 0; border-radius: 11px; padding: 10px 14px; font-weight: 600; }
+#start, #friendForm button { background: var(--sage-dark); color: white; box-shadow: 0 5px 12px rgba(49, 87, 72, .12); }
+#start:hover, #friendForm button:hover { background: #264a3b; box-shadow: 0 8px 18px rgba(49, 87, 72, .16); }
+#stop { background: #f0f2ec; color: #53645a; }
+#status { margin-top: 13px; padding: 10px 12px; border-radius: 11px; background: #f7f8f3; color: #718077; font-size: 12px; line-height: 1.55; white-space: pre-wrap; }
+#friendForm { display: flex; flex-direction: column; gap: 7px; }
+input, textarea { width: 100%; max-width: 100%; padding: 11px 13px; border: 1px solid #e0e5dc; border-radius: 11px; background: #fff; color: var(--ink); }
+input::placeholder, textarea::placeholder { color: #a3ada5; }
+input { margin: 0; }
+textarea { margin: 0; }
+#friendForm button { align-self: start; }
+.friend { padding: 12px 0; border-bottom: 1px solid #eef0e9; }
+.friend:last-child { border-bottom: 0; }
+.friend strong { font-size: 13px; }
+.friend .muted { margin-top: 3px; }
+.friends-panel button { margin: 7px 6px 0 0; padding: 7px 11px; font-size: 12px; }
+.privacy-panel .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0; font-size: 13px; }
+.switch-row input { width: 17px; height: 17px; accent-color: var(--sage-dark); }
+.privacy-panel > p { line-height: 1.65; }
+#deleteHistory { margin-top: 5px; font-size: 12px; }
+.map-stack { min-width: 0; }
+.map-heading { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin: 0 2px 13px; }
+#map { height: min(62vh, 640px); min-height: 390px; width: 100%; border: 5px solid var(--surface); border-radius: 22px; overflow: hidden; box-shadow: var(--shadow); z-index: 0; }
+.leaflet-container { font-family: 'DM Sans', sans-serif; background: #e9eee8; }
+.leaflet-control-attribution { font-size: 9px !important; }
+.reva-card { margin-top: 18px; padding: 25px; background: linear-gradient(135deg, #fffefa 0%, #f5f3f9 100%); border-color: #e8e4ef; }
+.reva-brand { display: flex; align-items: center; gap: 13px; margin-bottom: 8px; }
+.reva-avatar { width: 47px; height: 47px; display: grid; place-items: center; flex: 0 0 47px; border-radius: 16px; background: #e8e2f2; border: 1px solid #ddd5e9; color: #81729c; font-size: 27px; }
+.reva-title { margin: 0; font-size: 20px; letter-spacing: -.5px; }
+.reva-subtitle { margin-top: 4px; color: #8b819a; font-size: 12px; }
+.reva-card > .muted { max-width: 760px; line-height: 1.75; }
+.reva-prompts { display: flex; flex-wrap: wrap; gap: 8px; margin: 17px 0; }
+.reva-prompts button { padding: 8px 12px; border: 1px solid #e1dbea; border-radius: 999px; background: #fff; color: #726583; font-size: 12px; }
+.reva-prompts button:hover { background: #efebf6; border-color: #d7cce6; }
+#askForm { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+#askForm textarea { grid-column: 1 / -1; min-height: 88px; resize: vertical; line-height: 1.6; }
+#askForm label { grid-column: 1; grid-row: 3; margin: 0 !important; display: flex !important; align-items: flex-start; gap: 8px; color: var(--muted); font-size: 11px !important; line-height: 1.55; }
+#askForm label input { width: 15px !important; height: 15px; margin-top: 2px !important; flex: 0 0 auto; accent-color: var(--sage-dark); }
+#askForm button[type=submit] { grid-column: 2; grid-row: 3; background: var(--sage-dark); color: white; white-space: nowrap; }
+#askForm button[type=submit]:hover { background: #264a3b; }
+#answer { min-height: 0; margin: 14px 0 0; padding: 0; color: #52645a; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+#answer:not(:empty) { padding: 15px; border: 1px solid #e4e7df; border-radius: 13px; background: rgba(255,255,255,.76); }
+@media (min-width: 1500px) { .dashboard-grid, .page-intro { max-width: 1600px; } }
+@media (max-width: 1000px) { .dashboard-grid { grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr); gap: 15px; } .panel { padding: 17px; } #map { min-height: 340px; } }
+@media (max-width: 780px) { .app-header { min-height: 70px; } .page-intro { padding-top: 30px; align-items: flex-start; flex-direction: column; gap: 14px; } .dashboard-grid { grid-template-columns: 1fr; } .map-stack { order: -1; } #map { height: 50vh; min-height: 320px; } .dashboard-grid aside { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; align-items: start; } .dashboard-grid aside .panel { margin: 0; } .privacy-panel { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .app-header { padding: 12px 16px; } .wordmark-mark { width: 37px; height: 37px; border-radius: 13px; } .wordmark strong { font-size: 19px; } .wordmark small { font-size: 9px; } .header-actions { gap: 7px; } .gps-pill { padding: 7px 9px; font-size: 10px; } .logout-button { padding: 8px 11px; font-size: 12px; } .page-intro { padding: 27px 17px 22px; } .page-intro h1 { font-size: 30px; letter-spacing: -1px; } .intro-copy { font-size: 13px; } .dashboard-grid { padding: 0 14px 32px; gap: 13px; } .dashboard-grid aside { grid-template-columns: 1fr; } .privacy-panel { grid-column: auto; } .panel { border-radius: 17px; padding: 17px; } .map-heading { align-items: flex-start; flex-direction: column; } #map { height: 43vh; min-height: 290px; border-width: 4px; border-radius: 17px; } .reva-card { padding: 18px; } .reva-title { font-size: 18px; } #askForm { display: flex; flex-direction: column; align-items: stretch; } #askForm label { order: 2; } #askForm button[type=submit] { order: 3; align-self: flex-start; } .reva-prompts { gap: 6px; } .reva-prompts button { padding: 8px 10px; } }
+
+/* Reva premium / friend-radar refresh */
+.wordmark-mark{font-size:23px;border-radius:14px;background:#e6ecdf}
+.wordmark strong{letter-spacing:-.9px}
+.page-intro{position:relative;max-width:1600px;min-height:172px;padding-top:15px;padding-bottom:16px;justify-content:center;align-items:center;text-align:center}
+.page-intro .intro-center{max-width:720px}
+.page-intro .eyebrow{margin-bottom:9px}
+.page-intro h1{font-size:clamp(35px,4.1vw,50px);line-height:1.05;letter-spacing:-2.2px}
+.page-intro h1 em{color:#71927c}
+.page-intro .intro-copy{margin:12px auto 0;font-size:14px}
+.page-intro .privacy-note{position:absolute;right:clamp(18px,5vw,72px);bottom:25px}
+.map-stage{max-width:1600px;margin:0 auto;padding:0 clamp(18px,5vw,72px) 12px}
+.map-heading{display:flex;justify-content:space-between;align-items:end;gap:14px;margin:0 2px 11px}
+.map-heading h2{font-size:17px}
+.map-frame{position:relative;border:5px solid var(--surface);border-radius:23px;overflow:hidden;box-shadow:0 18px 55px rgba(42,59,48,.09)}
+#map{height:clamp(290px,40vh,410px);min-height:290px;width:100%;border:0;border-radius:18px;box-shadow:none}
+.map-overlay{position:absolute;top:14px;left:14px;z-index:500;display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid rgba(255,255,255,.8);border-radius:14px;background:rgba(255,254,250,.92);box-shadow:0 8px 25px rgba(35,51,44,.1);backdrop-filter:blur(12px);pointer-events:none}
+.map-overlay strong,.map-overlay small{display:block}
+.map-overlay strong{color:#405b4c;font-size:10px;letter-spacing:1.6px}
+.map-overlay small{margin-top:2px;color:#7c8a80;font-size:10px}
+.radar-pulse{position:relative;width:12px;height:12px;border-radius:50%;background:#719b7e}
+.radar-pulse:before,.radar-pulse:after{content:"";position:absolute;inset:-5px;border:1px solid rgba(113,155,126,.5);border-radius:50%;animation:reva-radar-pulse 2.2s ease-out infinite}
+.radar-pulse:after{animation-delay:1.1s}
+@keyframes reva-radar-pulse{0%{transform:scale(.45);opacity:.9}100%{transform:scale(2.8);opacity:0}}
+.map-hint{position:absolute;z-index:500;bottom:14px;left:50%;transform:translateX(-50%);max-width:calc(100% - 30px);padding:8px 13px;border:1px solid rgba(255,255,255,.8);border-radius:999px;background:rgba(255,254,250,.93);color:#64766a;font-size:11px;text-align:center;box-shadow:0 5px 18px rgba(35,51,44,.08);pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dashboard-grid{grid-template-columns:minmax(255px,310px) minmax(0,1fr);padding-top:3px}
+.dashboard-grid .map-stack{display:contents}
+.dashboard-grid .reva-card{grid-column:2;grid-row:1;margin-top:0}
+.dashboard-grid aside{grid-column:1;grid-row:1}
+.panel{border-radius:18px}
+.reva-title{font-family:'Manrope',sans-serif}
+.reva-avatar{border-radius:15px}
+@media (min-width:1100px) and (max-height:900px){
+.app-header{min-height:62px;padding-top:8px;padding-bottom:8px}
+.page-intro{min-height:148px;padding-top:10px;padding-bottom:10px}
+.page-intro h1{font-size:clamp(34px,3.5vw,44px)}
+.map-stage{padding-bottom:9px}
+#map{height:clamp(275px,39vh,355px);min-height:275px}
+.map-overlay{top:11px;left:11px}
+.dashboard-grid .panel{padding:15px;margin-bottom:10px}
+.dashboard-grid .reva-card{padding:17px}
+.dashboard-grid .reva-card>.muted{margin-top:7px;margin-bottom:7px}
+.dashboard-grid .reva-prompts{margin:8px 0}
+.dashboard-grid #askForm textarea{min-height:52px}
+}
+@media(max-width:780px){
+.page-intro{min-height:0;padding:25px 18px 17px}
+.page-intro h1{font-size:clamp(34px,8vw,44px);letter-spacing:-1.6px}
+.page-intro .privacy-note{position:static;margin-top:14px}
+.map-stage{padding:0 14px 15px}
+#map{height:48vh;min-height:290px}
+.dashboard-grid{display:grid;grid-template-columns:1fr}
+.dashboard-grid .map-stack{display:block}
+.dashboard-grid .reva-card,.dashboard-grid aside{grid-column:auto;grid-row:auto}
+.dashboard-grid aside{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dashboard-grid aside .panel{margin:0}
+}
+@media(max-width:520px){
+.page-intro{padding:24px 17px 17px}
+.page-intro h1{font-size:35px}
+.page-intro .intro-copy{max-width:310px;font-size:12px}
+.map-heading{align-items:flex-start;flex-direction:column}
+.map-caption{font-size:10px}
+.map-frame{border-width:4px;border-radius:18px}
+#map{height:43vh;min-height:280px}
+.map-overlay{top:9px;left:9px;padding:8px 10px}
+.map-hint{bottom:9px;font-size:10px}
+.dashboard-grid aside{grid-template-columns:1fr}
+}
+.auth-page{position:relative;overflow:hidden;background:radial-gradient(ellipse at 12% 18%,rgba(206,224,202,.7) 0,transparent 36%),radial-gradient(ellipse at 88% 82%,rgba(224,216,239,.75) 0,transparent 36%),#f6f6f2}
+.auth-page:before,.auth-page:after{content:"";position:fixed;width:280px;height:280px;border:1px solid rgba(114,145,122,.14);border-radius:50%;pointer-events:none}
+.auth-page:before{left:-130px;top:18%;box-shadow:0 0 0 24px rgba(114,145,122,.035),0 0 0 48px rgba(114,145,122,.025)}
+.auth-page:after{right:-130px;bottom:12%;box-shadow:0 0 0 24px rgba(137,119,160,.035),0 0 0 48px rgba(137,119,160,.025)}
+.auth-card{position:relative;z-index:1;border-radius:28px;box-shadow:0 30px 90px rgba(42,59,48,.1),0 2px 8px rgba(42,59,48,.025)}
+.auth-brand{justify-content:center}
+.auth-brand .wordmark-mark{width:48px;height:48px;border-radius:16px;font-size:24px}
+.auth-brand strong{font-size:25px}
+.auth-kicker{letter-spacing:2.1px}
+.auth-card h1{font-size:32px;letter-spacing:-1.4px}
+.auth-form input{transition:border-color .2s,box-shadow .2s}
+.auth-form input:focus{border-color:#9cb6a1;box-shadow:0 0 0 4px rgba(113,146,124,.1);outline:0}
+.auth-form button{box-shadow:0 8px 18px rgba(49,87,72,.14);transition:transform .18s,box-shadow .18s,background .18s}
+.auth-form button:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(49,87,72,.2)}
+@media(max-width:520px){.auth-card{border-radius:22px}.auth-brand{margin-bottom:25px}}
+
+/* Soft, game-like radar markers */
+.reva-marker-shell{background:transparent;border:0}
+.reva-pin{position:relative;display:block;width:17px;height:17px;margin:5px;border:3px solid #fff;border-radius:50%;box-shadow:0 3px 12px rgba(33,52,42,.28);transition:transform .25s ease}
+.reva-pin i{position:absolute;inset:3px;border-radius:50%;background:#fff;opacity:.9}
+.reva-pin-me{background:#315748;outline:5px solid rgba(93,139,106,.18)}
+.reva-pin-friend{background:#8b79a8;outline:4px solid rgba(139,121,168,.16)}
+.radar-targeted .reva-pin-friend{transform:scale(1.45);box-shadow:0 0 0 7px rgba(139,121,168,.18),0 0 0 15px rgba(139,121,168,.08),0 5px 18px rgba(33,52,42,.25)}
+.reva-pin-friend:after{content:"";position:absolute;inset:-8px;border:1px solid rgba(139,121,168,.5);border-radius:50%;animation:reva-friend-ping 2s ease-out infinite}
+@keyframes reva-friend-ping{0%{transform:scale(.55);opacity:.8}100%{transform:scale(1.8);opacity:0}}
+@media(prefers-reduced-motion:reduce){.radar-pulse:before,.radar-pulse:after,.reva-pin-friend:after{animation:none}.reva-pin{transition:none}}
+
+/* Reva: restore the original dashboard composition, with a square radar */
+:root{
+  --canvas:#f3f0e9;
+  --surface:#fffdf8;
+  --ink:#202c2b;
+  --muted:#777f7b;
+  --line:#e5e0d6;
+  --sage:#dce8dd;
+  --sage-strong:#577966;
+  --sage-dark:#294d40;
+  --lavender:#eee8f5;
+  --shadow:0 18px 50px rgba(39,48,43,.075);
+}
+body.app-shell{background:radial-gradient(ellipse at 92% 10%,rgba(226,218,239,.38),transparent 32%),linear-gradient(180deg,#f7f5ef 0%,var(--canvas) 100%)}
+.app-header{background:rgba(255,253,248,.88);border-bottom-color:rgba(219,213,202,.8);backdrop-filter:blur(18px)}
+.wordmark-mark{background:linear-gradient(145deg,#dce8dc,#e9e0f0);color:#344e42;box-shadow:inset 0 1px 0 rgba(255,255,255,.85)}
+.wordmark strong{font-size:23px;letter-spacing:-1px}
+.page-intro{min-height:0;padding:23px 24px 20px;max-width:1440px}
+.page-intro h1{font-size:clamp(29px,3.2vw,40px);letter-spacing:-1.8px}
+.page-intro .intro-copy{font-size:13px}
+.page-intro .privacy-note{background:#e9e2f0;color:#716084}
+.dashboard-grid{grid-template-columns:minmax(265px,320px) minmax(0,1fr);gap:22px;align-items:start}
+.dashboard-grid aside{grid-column:1;grid-row:1}
+.dashboard-grid .map-stage{grid-column:2;grid-row:1;width:100%;max-width:none;min-width:0;margin:0;padding:0}
+.dashboard-grid .map-stack{display:contents}
+.dashboard-grid .reva-card{grid-column:1/-1;grid-row:2;margin-top:0;padding:24px 26px}
+.dashboard-grid .map-heading{align-items:center;margin:0 3px 12px}
+.dashboard-grid .map-heading h2{font-size:18px}
+.map-stage .map-frame{position:relative;width:100%;aspect-ratio:1/1;height:auto;min-height:0;border:1px solid rgba(255,255,255,.9);border-radius:24px;overflow:hidden;background:#e7ebe3;box-shadow:0 22px 60px rgba(39,48,43,.12),0 0 0 5px rgba(255,253,248,.78)}
+.map-stage #map{position:absolute;inset:0;width:100%;height:100%;min-height:0;max-height:none;border:0;border-radius:22px;box-shadow:none}
+.map-overlay{background:rgba(255,253,248,.91);border-color:rgba(255,255,255,.88);box-shadow:0 10px 30px rgba(32,44,43,.13)}
+.map-overlay strong{color:#294d40}
+.map-hint{background:rgba(255,253,248,.94);color:#52675b}
+.radar-pulse{background:#b18bce}
+.radar-pulse:before,.radar-pulse:after{border-color:rgba(177,139,206,.65)}
+.reva-card{background:linear-gradient(115deg,#fffdf8 0%,#f5f1f7 55%,#eef3ec 100%);border-color:#e5dfeb;box-shadow:0 20px 55px rgba(50,47,58,.07)}
+.reva-avatar{background:linear-gradient(145deg,#e9e0f2,#dce9df);border-color:#e0d8e9;color:#6d5a85;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.reva-title{font-size:22px}
+.reva-prompts button{background:rgba(255,255,255,.76);border-color:#e3dbea;color:#6d5c7e}
+#askForm button[type=submit],#start,#friendForm button{background:linear-gradient(135deg,#345e4b,#263f38);box-shadow:0 8px 20px rgba(41,77,64,.18)}
+#askForm button[type=submit]:hover,#start:hover,#friendForm button:hover{background:linear-gradient(135deg,#294d40,#1f3831)}
+.panel{border-color:rgba(224,219,209,.9);box-shadow:0 12px 34px rgba(39,48,43,.055)}
+.section-icon{background:linear-gradient(145deg,#e2ebe0,#edf0e7);color:#4e705b}
+.friends-panel .section-icon{background:linear-gradient(145deg,#ece3f4,#f2edf6);color:#7b6594}
+.privacy-panel .section-icon{background:linear-gradient(145deg,#f4ead8,#f8f1e6);color:#987d4f}
+@media(min-width:781px){
+  .dashboard-grid .map-stage .map-caption{font-size:10px}
+  .dashboard-grid aside .panel{padding:18px;margin-bottom:13px}
+  .dashboard-grid .reva-card{margin-top:0}
+}
+@media(max-width:1000px) and (min-width:781px){
+  .dashboard-grid{grid-template-columns:minmax(240px,.78fr) minmax(0,1.22fr);gap:16px}
+  .dashboard-grid .map-stage .map-heading{align-items:flex-start;flex-direction:column;gap:4px}
+  .dashboard-grid .map-stage .map-heading h2{font-size:16px}
+  .dashboard-grid aside .panel{padding:15px}
+}
+@media(max-width:780px){
+  .page-intro{padding:25px 18px 18px}
+  .dashboard-grid{grid-template-columns:1fr;gap:14px}
+  .dashboard-grid aside{grid-column:1;grid-row:2}
+  .dashboard-grid .map-stage{grid-column:1;grid-row:1;padding:0}
+  .dashboard-grid .map-stack{display:contents}
+  .dashboard-grid .reva-card{grid-column:1;grid-row:3;padding:20px}
+  .dashboard-grid .map-stage .map-heading{align-items:flex-start;flex-direction:row}
+  .dashboard-grid .map-stage .map-caption{font-size:10px}
+  .map-stage .map-frame{aspect-ratio:1/1;border-radius:20px}
+  .map-stage #map{height:100%;min-height:0;border-radius:19px}
+}
+@media(max-width:520px){
+  .page-intro{padding:23px 17px 17px}
+  .page-intro h1{font-size:35px}
+  .dashboard-grid .map-stage .map-heading{flex-direction:column;gap:3px}
+  .dashboard-grid .map-stage .map-heading h2{font-size:17px}
+  .map-stage .map-frame{border-radius:18px}
+  .map-stage #map{border-radius:17px}
+  .dashboard-grid .reva-card{padding:18px}
+}
+
+
+/* Layout-only refinements: preserve the existing Reva color palette */
+.header-tagline {
+  margin: 0;
+  flex: 1 1 auto;
+  text-align: center;
+  color: var(--ink);
+  font: 700 clamp(15px, 1.7vw, 21px)/1.25 'Manrope', sans-serif;
+  letter-spacing: -.45px;
+  white-space: nowrap;
+}
+.header-tagline em { color: #71927c; font-style: normal; }
+.app-header { display: grid; grid-template-columns: minmax(170px, 1fr) minmax(220px, auto) minmax(170px, 1fr); }
+.header-actions { justify-self: end; }
+.dashboard-grid {
+  grid-template-columns: minmax(265px, 320px) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: stretch;
+  column-gap: 22px;
+  row-gap: 16px;
+}
+.dashboard-grid > aside {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  min-height: 0;
+}
+.dashboard-grid > aside > .panel {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 17px 18px;
+}
+.dashboard-grid > .map-stage {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+.dashboard-grid > .map-stack { display: contents; }
+.dashboard-grid > .reva-card,
+.dashboard-grid .reva-card {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  align-self: stretch;
+  margin: 0;
+}
+.dashboard-grid .map-stage .map-frame {
+  width: 100%;
+  aspect-ratio: 1.42 / 1;
+  height: auto;
+  min-height: 0;
+}
+.dashboard-grid .map-stage #map {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.dashboard-grid .friends-panel,
+.dashboard-grid .friends-panel #friends,
+.dashboard-grid .friends-panel #requests {
+  min-width: 0;
+  max-width: 100%;
+}
+.dashboard-grid .friends-panel #friends,
+.dashboard-grid .friends-panel #requests,
+.dashboard-grid .friends-panel .friend strong,
+.dashboard-grid .friends-panel .friend .muted {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.dashboard-grid .friends-panel .friend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  min-width: 0;
+  width: 100%;
+}
+.dashboard-grid .friends-panel .friend > * { min-width: 0; max-width: 100%; }
+.dashboard-grid .friends-panel .friend .muted { flex: 1 1 100%; }
+.dashboard-grid .friends-panel .friend button { max-width: 100%; white-space: normal; }
+.dashboard-grid #friendForm { display: flex; flex-direction: column; min-width: 0; }
+.dashboard-grid #friendForm input { min-width: 0; }
+@media (max-width: 1000px) and (min-width: 781px) {
+  .app-header { grid-template-columns: minmax(140px, 1fr) minmax(190px, auto) minmax(140px, 1fr); }
+  .dashboard-grid { grid-template-columns: minmax(240px, .82fr) minmax(0, 1.18fr); column-gap: 16px; }
+  .dashboard-grid > aside > .panel { padding: 15px; }
+  .dashboard-grid .map-stage .map-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+}
+@media (max-width: 780px) {
+  .app-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 16px;
+  }
+  .header-tagline {
+    order: 3;
+    flex: 1 0 100%;
+    white-space: normal;
+    text-align: center;
+    padding: 2px 0 4px;
+  }
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: 14px;
+  }
+  .dashboard-grid > .map-stage { grid-column: 1; grid-row: 1; padding: 0 14px; }
+  .dashboard-grid > aside {
+    grid-column: 1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .dashboard-grid > aside > .panel { min-height: 0; margin: 0; }
+  .dashboard-grid > aside > .privacy-panel { grid-column: 1 / -1; }
+  .dashboard-grid > .map-stack { display: contents; }
+  .dashboard-grid > .reva-card,
+  .dashboard-grid .reva-card { grid-column: 1; grid-row: 3; margin: 0; }
+  .dashboard-grid .map-stage .map-frame { aspect-ratio: 1.35 / 1; }
+}
+@media (max-width: 520px) {
+  .header-tagline { font-size: 15px; }
+  .dashboard-grid > aside { grid-template-columns: 1fr; }
+  .dashboard-grid > aside > .privacy-panel { grid-column: auto; }
+  .dashboard-grid > .map-stage { padding: 0 14px; }
+  .dashboard-grid .map-stage .map-frame { aspect-ratio: 1 / 1; }
+}
+
+
+/* Header polish: one-line tagline, privacy badge at left, existing colors retained */
+.app-header {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(0, auto) minmax(170px, 1fr);
+  align-items: center;
+  gap: 18px;
+}
+.header-choice {
+  justify-self: start;
+  min-width: 0;
+  text-decoration: none;
+}
+.header-choice .privacy-note {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  margin: 0;
+}
+.header-tagline {
+  justify-self: center;
+  text-align: center;
+  white-space: nowrap;
+  margin: 0;
+  line-height: 1.2;
+  font-size: clamp(14px, 1.55vw, 20px);
+}
+.header-actions { justify-self: end; min-width: 0; }
+@media (max-width: 780px) {
+  .app-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+  }
+  .header-choice { grid-column: 1; grid-row: 1; }
+  .header-actions { grid-column: 2; grid-row: 1; }
+  .header-tagline {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
+    white-space: nowrap;
+    width: 100%;
+    font-size: clamp(13px, 3.7vw, 17px);
+  }
+}
+@media (max-width: 360px) {
+  .header-tagline { font-size: 12px; letter-spacing: -.3px; }
+  .header-choice .privacy-note { font-size: 11px; padding: 5px 8px; }
+}
+
+
+/* Keep the map fully visible in the first desktop viewport and prioritize it on mobile */
+@media (min-width:781px) {
+  .app-header { min-height:66px; padding-top:10px; padding-bottom:10px; }
+  .page-intro { min-height:0; padding-top:12px; padding-bottom:12px; }
+  .dashboard-grid { align-items:start; }
+  .dashboard-grid .map-stage .map-heading { margin-bottom:8px; }
+  .dashboard-grid .map-stage .map-frame { aspect-ratio:1.62 / 1; width:100%; height:auto; min-height:0; }
+  .dashboard-grid .map-stage #map { position:absolute; inset:0; width:100%; height:100%; min-height:0; }
+}
+@media (min-width:781px) and (max-height:800px) {
+  .app-header { min-height:58px; padding-top:7px; padding-bottom:7px; }
+  .page-intro { padding-top:7px; padding-bottom:8px; }
+  .page-intro .intro-copy { margin-top:5px; }
+  .dashboard-grid .map-stage .map-heading { margin-bottom:6px; }
+  .dashboard-grid .map-stage .map-frame { aspect-ratio:1.72 / 1; }
+}
+@media (max-width:780px) {
+  .page-intro { padding-top:12px; padding-bottom:10px; }
+  .page-intro .intro-copy { margin-top:4px; }
+  .dashboard-grid { gap:12px; }
+  .dashboard-grid .map-stage { grid-row:1; }
+  .dashboard-grid .map-stage .map-heading { margin-bottom:7px; }
+  .dashboard-grid .map-stage .map-frame { aspect-ratio:1.42 / 1; width:100%; height:auto; min-height:0; }
+  .dashboard-grid .map-stage #map { position:absolute; inset:0; width:100%; height:100%; min-height:0; }
+}
+@media (max-width:520px) {
+  .app-header { min-height:0; }
+  .page-intro { padding-top:10px; padding-bottom:8px; }
+  .dashboard-grid { padding-top:0; }
+  .dashboard-grid .map-stage .map-heading { gap:2px; }
+  .dashboard-grid .map-stage .map-frame { aspect-ratio:1.32 / 1; }
+}
+
+
+/* Consistent alignment and spacing for the three control cards */
+.dashboard-grid > aside > .sharing-panel,
+.dashboard-grid > aside > .friends-panel,
+.dashboard-grid > aside > .privacy-panel {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  gap: 12px;
+  min-width: 0;
+}
+.dashboard-grid > aside .section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  text-align: left;
+}
+.dashboard-grid > aside .section-heading > div {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+}
+.dashboard-grid > aside .section-heading .eyebrow,
+.dashboard-grid > aside .section-heading h2 {
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+}
+.dashboard-grid > aside .section-heading h2 {
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.dashboard-grid > aside .muted {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  text-align: left;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.dashboard-grid > aside .sharing-panel > button,
+.dashboard-grid > aside .privacy-panel > button {
+  align-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+.dashboard-grid > aside #status {
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 12px;
+  text-align: left;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.dashboard-grid > aside #friendForm {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+.dashboard-grid > aside #friendForm input,
+.dashboard-grid > aside #friendForm button {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+.dashboard-grid > aside #requests,
+.dashboard-grid > aside #friends {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.dashboard-grid > aside .friend {
+  box-sizing: border-box;
+  padding: 11px 0;
+  text-align: left;
+  justify-content: flex-start;
+  align-items: center;
+}
+.dashboard-grid > aside .friend strong {
+  line-height: 1.4;
+  text-align: left;
+}
+.dashboard-grid > aside .switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  text-align: left;
+}
+.dashboard-grid > aside .switch-row span {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.dashboard-grid > aside .switch-row input {
+  flex: 0 0 auto;
+  margin: 0;
+}
+.dashboard-grid > aside .privacy-panel #deleteHistory {
+  margin-top: auto;
+}
+@media (min-width:781px) {
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel,
+  .dashboard-grid > aside > .privacy-panel {
+    padding: 17px 18px;
+  }
+}
+@media (max-width:780px) {
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel,
+  .dashboard-grid > aside > .privacy-panel {
+    gap: 10px;
+  }
+  .dashboard-grid > aside > .privacy-panel #deleteHistory {
+    margin-top: 0;
+  }
+}
+
+
+/* Final separation pass: keep the three left-side panels visually distinct */
+.dashboard-grid > aside {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+}
+.dashboard-grid > aside > .sharing-panel,
+.dashboard-grid > aside > .friends-panel,
+.dashboard-grid > aside > .privacy-panel {
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  margin: 0;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  overflow: visible;
+}
+.dashboard-grid > aside > .sharing-panel + .friends-panel,
+.dashboard-grid > aside > .friends-panel + .privacy-panel {
+  margin-top: 0;
+}
+.dashboard-grid > aside .section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 15px;
+}
+.dashboard-grid > aside .section-heading > div {
+  min-width: 0;
+}
+.dashboard-grid > aside .section-heading h2 {
+  margin: 0;
+  line-height: 1.3;
+}
+.dashboard-grid > aside .sharing-panel > p,
+.dashboard-grid > aside .privacy-panel > p {
+  margin: 0 0 14px;
+}
+.dashboard-grid > aside .sharing-panel > button {
+  display: block;
+  width: 100%;
+  margin: 0 0 8px;
+  text-align: center;
+}
+.dashboard-grid > aside .sharing-panel > button:last-of-type {
+  margin-bottom: 0;
+}
+.dashboard-grid > aside #status {
+  margin-top: 12px;
+}
+.dashboard-grid > aside #friendForm {
+  gap: 9px;
+  margin-bottom: 10px;
+}
+.dashboard-grid > aside #friendForm button {
+  align-self: stretch;
+  width: 100%;
+}
+.dashboard-grid > aside #requests,
+.dashboard-grid > aside #friends {
+  margin-top: 0;
+}
+.dashboard-grid > aside .privacy-panel .switch-row {
+  margin: 0 0 12px;
+}
+.dashboard-grid > aside .privacy-panel #deleteHistory {
+  display: block;
+  width: 100%;
+  margin: 12px 0 0;
+  white-space: normal;
+}
+@media (max-width:780px) {
+  .dashboard-grid > aside {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 14px;
+  }
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel,
+  .dashboard-grid > aside > .privacy-panel {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+    border-radius: 18px;
+  }
+  .dashboard-grid > aside > .privacy-panel {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width:520px) {
+  .dashboard-grid > aside {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 13px;
+  }
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel,
+  .dashboard-grid > aside > .privacy-panel {
+    padding: 17px;
+  }
+  .dashboard-grid > aside > .privacy-panel {
+    grid-column: auto;
+  }
+}
+
+
+/* Desktop balance: three equal-height control cards span from map top to Reva bottom */
+@media (min-width:781px) {
+  .dashboard-grid {
+    align-items: stretch;
+    grid-template-rows: auto auto;
+  }
+  .dashboard-grid > aside {
+    align-self: stretch;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 14px;
+  }
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel,
+  .dashboard-grid > aside > .privacy-panel {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    padding: 17px 18px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .dashboard-grid > aside > .sharing-panel > .section-heading,
+  .dashboard-grid > aside > .friends-panel > .section-heading,
+  .dashboard-grid > aside > .privacy-panel > .section-heading {
+    flex: 0 0 auto;
+    margin-bottom: 12px;
+  }
+  .dashboard-grid > aside > .sharing-panel > p,
+  .dashboard-grid > aside > .privacy-panel > p {
+    flex: 0 0 auto;
+    line-height: 1.45;
+  }
+  .dashboard-grid > aside > .sharing-panel #status {
+    flex: 0 1 auto;
+    overflow-wrap: anywhere;
+  }
+  .dashboard-grid > aside > .friends-panel #requests,
+  .dashboard-grid > aside > .friends-panel #friends {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .dashboard-grid > aside > .privacy-panel #deleteHistory {
+    margin-top: auto;
+  }
+}
+@media (max-width:780px) {
+  .dashboard-grid { align-items: start; }
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel,
+  .dashboard-grid > aside > .privacy-panel {
+    flex: initial;
+    height: auto;
+    overflow: visible;
+  }
+}
+
+/* Login/register: medium-paced ambient motion, kept behind the form card. */
+.auth-page {
+  background-size: 160% 160%, 160% 160%, 100% 100%;
+  animation: reva-auth-aurora 16s ease-in-out infinite alternate;
+}
+.auth-page::before,
+.auth-page::after {
+  will-change: transform, opacity;
+}
+.auth-page::before {
+  animation: reva-auth-orbit-left 13s ease-in-out infinite alternate;
+}
+.auth-page::after {
+  animation: reva-auth-orbit-right 15s ease-in-out infinite alternate;
+}
+@keyframes reva-auth-aurora {
+  0% { background-position: 0% 15%, 100% 85%, center; }
+  50% { background-position: 55% 45%, 45% 55%, center; }
+  100% { background-position: 100% 75%, 0% 25%, center; }
+}
+@keyframes reva-auth-orbit-left {
+  0% { transform: translate3d(0, -8px, 0) scale(.94); opacity: .7; }
+  50% { transform: translate3d(34px, 22px, 0) scale(1.04); opacity: 1; }
+  100% { transform: translate3d(12px, -18px, 0) scale(.98); opacity: .78; }
+}
+@keyframes reva-auth-orbit-right {
+  0% { transform: translate3d(0, 10px, 0) scale(1.02); opacity: .7; }
+  50% { transform: translate3d(-30px, -24px, 0) scale(.92); opacity: 1; }
+  100% { transform: translate3d(-10px, 14px, 0) scale(1.06); opacity: .8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-page,
+  .auth-page::before,
+  .auth-page::after {
+    animation: none !important;
+  }
+}
+
+/* Auth pages: replace decorative rings with a quiet, full-screen map backdrop. */
+.auth-page {
+  isolation: isolate;
+  overflow: hidden;
+  background: #edf0e8;
+}
+.auth-page::before,
+.auth-page::after {
+  content: none !important;
+  display: none !important;
+  animation: none !important;
+}
+.auth-map-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(232, 239, 226, .92), rgba(245, 242, 249, .88)),
+    #edf0e8;
+  pointer-events: none;
+}
+.auth-map-background .leaflet-tile-pane {
+  filter: saturate(.55) contrast(.86);
+}
+.auth-map-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(246, 246, 242, .60), rgba(246, 246, 242, .30) 50%, rgba(246, 246, 242, .60)),
+    rgba(241, 243, 236, .30);
+  pointer-events: none;
+}
+.auth-card {
+  z-index: 2;
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-page,
+  .auth-page::before,
+  .auth-page::after {
+    animation: none !important;
+  }
+}
+
+
+/* Gentle map motion: tiles drift slowly and reverse direction smoothly. */
+.auth-map-background .leaflet-tile-pane {
+  filter: saturate(.55) contrast(.86);
+}
+.auth-map-background .leaflet-control-container {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-map-background,
+  .auth-map-background * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+/* 3D rotating globe backdrop for login and registration. */
+.auth-map-background {
+  background: radial-gradient(ellipse at 50% 45%, #dbe7e6 0%, #e8eee8 48%, #f3f1f5 100%);
+}
+.auth-map-background .scene-container {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+.auth-map-background canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+.auth-map-background::after {
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(246, 246, 242, .16), rgba(246, 246, 242, .42) 72%),
+    linear-gradient(90deg, rgba(246, 246, 242, .40), rgba(246, 246, 242, .12) 50%, rgba(246, 246, 242, .40));
+}
+@media (max-width: 600px) {
+  .auth-map-background .scene-container {
+    transform: scale(1.22);
+    transform-origin: center center;
+  }
+}
+
+
+/* Flat world map with continuously drifting routes, no 3D globe. */
+.auth-map-background {
+  background: #e8eee8;
+}
+.auth-map-background .leaflet-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #e8eee8;
+  font: inherit;
+}
+.auth-map-background .leaflet-tile-pane {
+  filter: saturate(.58) contrast(.92) brightness(1.03);
+}
+.auth-map-background .leaflet-control-container {
+  display: none !important;
+}
+.auth-map-background::after {
+  background:
+    linear-gradient(90deg, rgba(246,246,242,.52), rgba(246,246,242,.20) 50%, rgba(246,246,242,.52)),
+    linear-gradient(0deg, rgba(237,241,233,.24), rgba(237,241,233,.12));
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-map-background .leaflet-pane {
+    transition: none !important;
+  }
+}
+
+
+/* Authentication map: remove the whitish veil and keep map tiles crisp. */
+.auth-map-background {
+  background: #dce5df !important;
+}
+.auth-map-background .leaflet-tile-pane {
+  filter: saturate(.9) contrast(1.04) brightness(1) !important;
+}
+.auth-map-background::after {
+  background: transparent !important;
+  opacity: 0 !important;
+}
+.auth-map-background .leaflet-container {
+  background: #dce5df !important;
+}
+
+
+/* Keep friend actions clear and aligned within each friend row. */
+.friends-panel .friend-remove {
+  margin-left: 8px;
+  border: 1px solid #e2d9d5;
+  background: #faf4f1;
+  color: #895b53;
+}
+.friends-panel .friend-remove:hover {
+  background: #f2e7e2;
+}
+.friends-panel .friend-remove:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+
+/* Safety Travel dashboard entry */
+.safety-travel-entry { background: linear-gradient(145deg, #fffefa 0%, #edf4ec 100%); border-color: #dce8dc; }
+.safety-travel-entry .safety-icon { background: #dcebdd; color: #315748; font-size: 23px; }
+.safety-travel-entry > p { line-height: 1.7; }
+.safety-travel-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; margin-top: 14px; padding: 12px 15px; border-radius: 12px; background: var(--sage-dark); color: #fff; text-decoration: none; font-weight: 700; box-shadow: 0 6px 16px rgba(49,87,72,.13); transition: transform .18s ease, background .18s ease; }
+.safety-travel-link:hover { background: #264a3b; transform: translateY(-1px); }
+.safety-entry-note { margin: 10px 0 0; color: #8a958b; font-size: 11px; }
+
+/* Active friend journey inbox: a permanent discovery point for shared trips */
+.shared-journeys-panel .section-heading{margin-bottom:8px}
+.shared-journeys-panel>.muted{line-height:1.6;margin:0 0 10px}
+.shared-journeys-empty{padding:12px;border-radius:11px;background:#f7f8f3;line-height:1.6}
+.shared-journey-item{padding:12px 0;border-top:1px solid #eef0e9}
+.shared-journey-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.shared-journey-top strong{font-size:13px;overflow-wrap:anywhere}
+.shared-journey-status{padding:3px 8px;border-radius:999px;background:#e7f1e6;color:#41684b;font-size:10px;font-weight:700;white-space:nowrap}
+.shared-journey-item p{margin:5px 0 9px;font-size:11px;overflow-wrap:anywhere}
+.shared-journey-open{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border-radius:10px;background:var(--sage-dark);color:#fff;text-decoration:none;font-size:11px;font-weight:700}
+.shared-journey-open:hover{background:#264a3b}
+@media(max-width:780px){.shared-journeys-panel{grid-column:1/-1}}
+
+
+/* Completed shared journeys stay visible until this friend acknowledges them. */
+.shared-journey-finished{padding:13px;margin:8px 0;border:1px solid #dce8dc;border-radius:13px;background:linear-gradient(135deg,#f5faf2,#fffdf8)}
+.shared-journey-finished .shared-journey-status{background:#dcefe0;color:#2e6744}
+.shared-journey-dismiss{display:inline-flex;align-items:center;justify-content:center;margin-top:2px;padding:8px 12px;border:1px solid #d2e0d2;border-radius:10px;background:#fff;color:#315e43;font:700 11px Manrope,sans-serif;cursor:pointer}
+.shared-journey-dismiss:hover{background:#e8f2e7}
+.shared-journey-dismiss:disabled{opacity:.6;cursor:wait}
+
+
+/* Friends' Journey cards: keep every label, status and action inside its own card. */
+.dashboard-grid > aside > .shared-journeys-panel {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.shared-journeys-panel #sharedJourneys {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.shared-journeys-panel #sharedJourneys > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.shared-journeys-panel .shared-journey-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 13px;
+  border: 1px solid #e7e9e1;
+  border-radius: 13px;
+  background: #fffefa;
+  overflow: hidden;
+}
+.shared-journeys-panel .shared-journey-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+.shared-journeys-panel .shared-journey-top strong {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.45;
+}
+.shared-journeys-panel .shared-journey-status {
+  justify-self: end;
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+.shared-journeys-panel .shared-journey-item p {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+.shared-journeys-panel .shared-journey-open,
+.shared-journeys-panel .shared-journey-dismiss {
+  align-self: flex-start;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+.shared-journeys-panel .shared-journey-dismiss {
+  margin-top: 0;
+}
+.shared-journeys-panel .shared-journeys-empty {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 520px) {
+  .shared-journeys-panel .shared-journey-item { padding: 12px; }
+  .shared-journeys-panel .shared-journey-top { grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+  .shared-journeys-panel .shared-journey-status { font-size: 9px; padding: 3px 6px; }
+}
+
+
+/* Balanced dashboard panel heights and safer content spacing. */
+.dashboard-grid {
+  align-items: stretch;
+}
+.dashboard-grid > aside {
+  align-self: stretch;
+  gap: 16px;
+  min-width: 0;
+}
+.dashboard-grid > aside > .sharing-panel,
+.dashboard-grid > aside > .friends-panel,
+.dashboard-grid > aside > .privacy-panel,
+.dashboard-grid > aside > .shared-journeys-panel,
+.dashboard-grid > .reva-card,
+.dashboard-grid .reva-card {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+.dashboard-grid > aside > .sharing-panel {
+  min-height: 320px;
+  padding: 22px;
+}
+.dashboard-grid > aside > .sharing-panel .section-heading {
+  margin-bottom: 17px;
+}
+.dashboard-grid > aside > .sharing-panel > p {
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.dashboard-grid > aside > .sharing-panel #status {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+}
+.dashboard-grid > aside > .sharing-panel .mobility-entry-button {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+}
+.dashboard-grid > aside > .friends-panel {
+  min-height: 350px;
+  padding: 22px;
+}
+.dashboard-grid > aside > .friends-panel #requests,
+.dashboard-grid > aside > .friends-panel #friends {
+  min-height: 40px;
+}
+.dashboard-grid > .reva-card,
+.dashboard-grid .reva-card {
+  min-height: 410px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 12px;
+  overflow: visible;
+}
+.dashboard-grid .reva-card .reva-brand {
+  margin-bottom: 2px;
+}
+.dashboard-grid .reva-card > .muted {
+  max-width: 900px;
+  line-height: 1.8;
+  margin: 0;
+}
+.dashboard-grid .reva-card .reva-prompts {
+  margin: 10px 0 12px;
+}
+.dashboard-grid .reva-card #askForm {
+  width: 100%;
+  min-width: 0;
+  gap: 14px;
+}
+.dashboard-grid .reva-card #askForm textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 124px;
+  padding: 15px 16px;
+  line-height: 1.65;
+}
+.dashboard-grid .reva-card #askForm label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.dashboard-grid .reva-card #askForm button[type="submit"] {
+  min-height: 42px;
+  max-width: 100%;
+  white-space: normal;
+}
+.dashboard-grid .reva-card #answer {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 781px) {
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel {
+    padding: 22px;
+  }
+}
+@media (max-width: 780px) {
+  .dashboard-grid > aside > .sharing-panel {
+    min-height: 0;
+    padding: 20px;
+  }
+  .dashboard-grid > aside > .friends-panel {
+    min-height: 0;
+    padding: 20px;
+  }
+  .dashboard-grid > .reva-card,
+  .dashboard-grid .reva-card {
+    min-height: 0;
+    padding: 24px;
+    gap: 10px;
+  }
+  .dashboard-grid .reva-card #askForm textarea {
+    min-height: 135px;
+  }
+}
+@media (max-width: 520px) {
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel {
+    padding: 18px;
+  }
+  .dashboard-grid > .reva-card,
+  .dashboard-grid .reva-card {
+    padding: 19px;
+  }
+  .dashboard-grid .reva-card #askForm {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dashboard-grid .reva-card #askForm label,
+  .dashboard-grid .reva-card #askForm button[type="submit"] {
+    width: 100%;
+    max-width: 100%;
+    align-self: stretch;
+  }
+}
+
+
+/* Definitive overflow fix: let dashboard cards grow to fit their content.
+   Earlier equal-height flex rules were squeezing the three sidebar cards into
+   the map + Reva grid height and clipping their lower content. */
+@media (min-width: 781px) {
+  .dashboard-grid {
+    align-items: start;
+    grid-template-rows: auto auto;
+  }
+  .dashboard-grid > aside {
+    align-self: start;
+    height: auto;
+    min-height: 0;
+    grid-row: 1 / 3;
+    overflow: visible;
+    justify-content: flex-start;
+    gap: 16px;
+  }
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel,
+  .dashboard-grid > aside > .shared-journeys-panel,
+  .dashboard-grid > aside > .privacy-panel {
+    flex: 0 0 auto;
+    height: auto;
+    min-height: max-content;
+    max-height: none;
+    overflow: visible;
+    padding: 20px;
+    margin: 0;
+  }
+  .dashboard-grid > aside > .sharing-panel #status {
+    display: block;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .dashboard-grid > aside > .friends-panel #friends,
+  .dashboard-grid > aside > .friends-panel #requests {
+    height: auto;
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+    padding-right: 4px;
+  }
+  .dashboard-grid > aside > .privacy-panel #deleteHistory {
+    margin-top: 8px;
+  }
+}
+.dashboard-grid > aside > .sharing-panel,
+.dashboard-grid > aside > .friends-panel,
+.dashboard-grid > aside > .shared-journeys-panel,
+.dashboard-grid > aside > .privacy-panel {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.dashboard-grid > aside > .sharing-panel *,
+.dashboard-grid > aside > .friends-panel *,
+.dashboard-grid > aside > .shared-journeys-panel *,
+.dashboard-grid > aside > .privacy-panel * {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.dashboard-grid > aside > .sharing-panel > *,
+.dashboard-grid > aside > .friends-panel > *,
+.dashboard-grid > aside > .shared-journeys-panel > *,
+.dashboard-grid > aside > .privacy-panel > * {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 780px) {
+  .dashboard-grid > aside > .sharing-panel,
+  .dashboard-grid > aside > .friends-panel,
+  .dashboard-grid > aside > .shared-journeys-panel,
+  .dashboard-grid > aside > .privacy-panel {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+  .dashboard-grid > aside > .sharing-panel #status {
+    display: block;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  .dashboard-grid > aside > .friends-panel #friends,
+  .dashboard-grid > aside > .friends-panel #requests {
+    max-height: 320px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+
+/* Compact desktop dashboard: bring Ask Reva closer to the map and keep
+   the Your Circle card modest while its friend list scrolls internally. */
+@media (min-width: 781px) {
+  .dashboard-grid {
+    column-gap: 18px;
+    row-gap: 10px;
+    align-items: start;
+    grid-template-rows: auto auto;
+  }
+  .dashboard-grid > .map-stage,
+  .dashboard-grid > .map-stack {
+    min-width: 0;
+    margin: 0;
+    align-self: start;
+  }
+  .dashboard-grid > .map-stack {
+    padding-top: 0;
+    margin-top: 0;
+  }
+  .dashboard-grid > .map-stack > .reva-card {
+    margin-top: 0;
+  }
+  .dashboard-grid > aside {
+    gap: 12px;
+  }
+  .dashboard-grid > aside > .friends-panel {
+    min-height: 0;
+    padding-bottom: 15px;
+  }
+  .dashboard-grid > aside > .friends-panel #friends,
+  .dashboard-grid > aside > .friends-panel #requests {
+    max-height: 170px;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-right: 5px;
+  }
+}
+@media (max-width: 780px) {
+  .dashboard-grid > .map-stack {
+    margin-top: 0;
+    padding-top: 0;
+  }
+  .dashboard-grid > aside > .friends-panel #friends,
+  .dashboard-grid > aside > .friends-panel #requests {
+    max-height: 220px;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f6f2">
+  <title>Who's Out There? — Sign In</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+  <style>
+    .auth-page{min-height:100vh;display:grid;place-items:center;padding:28px 16px;background:var(--canvas)}
+    .auth-card{width:min(100%,440px);padding:clamp(25px,6vw,42px);border:1px solid var(--line);border-radius:25px;background:rgba(255,254,250,.94);box-shadow:0 24px 80px rgba(42,59,48,.09)}
+    .auth-brand{display:flex;justify-content:center;margin-bottom:32px}.auth-kicker{text-align:center;color:#849688;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase}
+    .auth-card h1{text-align:center;margin:8px 0 9px;font:700 29px/1.2 'Manrope',sans-serif;letter-spacing:-1px}.auth-lede{text-align:center;margin:0 auto 27px;max-width:300px;color:var(--muted);font-size:13px;line-height:1.7}
+    .auth-form{display:grid;gap:15px}.auth-form label{display:grid;gap:7px;color:#52635a;font-size:12px;font-weight:600}.auth-form input{padding:13px 14px;border-radius:12px}.auth-form button{margin-top:5px;padding:13px;border:0;border-radius:12px;background:var(--sage-dark);color:white;font-weight:700}.auth-form button:hover{background:#264a3b}.auth-form button:disabled{opacity:.65;cursor:wait}
+    .auth-foot{text-align:center;margin:23px 0 0;color:var(--muted);font-size:12px}.auth-foot a{color:var(--sage-dark);font-weight:700;text-decoration:none}.auth-foot a:hover{text-decoration:underline}
+    .auth-message{margin:12px 0 0;color:#a44e48;font-size:12px;text-align:center}.auth-note{display:flex;gap:9px;align-items:flex-start;margin-top:24px;padding:12px;border-radius:12px;background:#f4f5ef;color:#7c887e;font-size:11px;line-height:1.6}
+
+    .auth-page { min-height:100svh; background:var(--canvas); }
+/* Keep the map crisp and remove the two decorative circular patches. */
+    .auth-card { backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px); }
+
+    }
+\n  </style>
+</head>
+<body>
+<main class="auth-page">
+    <div id="authMap" class="auth-map-background" aria-hidden="true"></div>
+    <section class="auth-card">
+      <div class="auth-teaser"><p class="auth-kicker"><h1>Someone's out there.</h1><p class="auth-lede">Your friends are closer than you think. Sign in to find your people on the map.</p></div>
+      <form id="loginForm" class="auth-form">
+        <label for="email">Email address<input type="email" id="email" placeholder="you@example.com" autocomplete="email" required></label>
+        <label for="password">Password<input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required></label>
+        <button type="submit">Sign in gently →</button>
+      </form>
+      <p id="authMessage" class="auth-message" role="status"></p>
+      <p class="auth-foot">New to Reva? <a href="/register">Create an account</a></p>
+      <div class="auth-note"><span aria-hidden="true">◈</span><span>Your location stays private by default. You decide when to share it and with whom.</span></div>
+    </section>
+  </main>
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const button = e.currentTarget.querySelector("button[type=submit]");
+  const message = document.getElementById("authMessage");
+  button.disabled = true; button.textContent = "Signing you in…"; message.textContent = "";
+  try {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+      })
+    });
+    const data = await response.json();
+    if (data.success) {
+      localStorage.setItem("token", data.token);
+      window.location.href = "/tracker";
+    } else {
+      message.textContent = data.message || "We couldn't sign you in. Please check your details.";
+    }
+  } catch (_) {
+    message.textContent = "Something went wrong. Please try again in a moment.";
+  } finally {
+    button.disabled = false; button.textContent = "Sign in gently →";
+  }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+  (() => {
+    const host = document.getElementById("authMap");
+    if (!host || !window.L) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const map = L.map(host, {
+      zoomControl: false, attributionControl: false,
+      dragging: false, touchZoom: false, scrollWheelZoom: false,
+      doubleClickZoom: false, boxZoom: false, keyboard: false,
+      preferCanvas: true, worldCopyJump: true
+    }).setView([18, 0], 2);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      subdomains: "abc", maxZoom: 19, noWrap: false
+    }).addTo(map);
+
+    // Smooth 10-second speed cycle: fast for the first half, slow for the second.
+    // Cosine easing blends between speeds without a sudden acceleration or pause.
+    let frame = null;
+    let last = 0;
+    let cycleTime = 0;
+    let horizontalCarry = 0;
+    let verticalCarry = 0;
+    const cycleDuration = 10000;
+    const slowSpeed = 0.018; // pixels per millisecond
+    const fastSpeed = 0.14;  // pixels per millisecond
+
+    const animate = (timestamp) => {
+      if (document.hidden || reducedMotion.matches) {
+        frame = null;
+        last = 0;
+        return;
+      }
+      if (!last) last = timestamp;
+      const dt = Math.min(timestamp - last, 40);
+      last = timestamp;
+      cycleTime = (cycleTime + dt) % cycleDuration;
+
+      // Speed eases from fast -> slow over 5 seconds, then slow -> fast over 5 seconds.
+      const fastWeight = (1 + Math.cos((2 * Math.PI * cycleTime) / cycleDuration)) / 2;
+      const speed = slowSpeed + (fastSpeed - slowSpeed) * fastWeight;
+      horizontalCarry += dt * speed;
+      verticalCarry += Math.sin(cycleTime / 1500) * dt * speed * 0.12;
+      const dx = Math.trunc(horizontalCarry);
+      const dy = Math.trunc(verticalCarry);
+      if (dx || dy) {
+        horizontalCarry -= dx;
+        verticalCarry -= dy;
+        map.panBy([dx, dy], { animate: false, noMoveStart: true });
+      }
+      frame = requestAnimationFrame(animate);
+    };
+
+    const start = () => {
+      if (!document.hidden && !reducedMotion.matches && frame === null) {
+        last = 0;
+        frame = requestAnimationFrame(animate);
+      }
+    };
+    const stop = () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = null;
+      last = 0;
+    };
+
+    setTimeout(() => map.invalidateSize(false), 100);
+    start();
+    document.addEventListener("visibilitychange", () => document.hidden ? stop() : start());
+    reducedMotion.addEventListener?.("change", () => reducedMotion.matches ? stop() : start());
+    window.addEventListener("resize", () => map.invalidateSize(false), { passive: true });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: reva-unified
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: RAG_SERVICE_TOKEN
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ORS_API_KEY
+        sync: false
+      - key: MOBILITY_CALLBACK_SECRET
+        sync: false
