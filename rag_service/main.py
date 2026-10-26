@@ -37,7 +37,7 @@ VECTOR_INDEX = os.getenv("RAG_VECTOR_INDEX", "location_event_vector_index_384")
 # Set RAG_DISABLE_EMBEDDINGS=true on small hosted instances to avoid model-download stalls.
 # Retrieval then uses the authorized MongoDB history fallback and skips embedding writes.
 RAG_DISABLE_EMBEDDINGS = os.getenv("RAG_DISABLE_EMBEDDINGS", "false").strip().lower() in {"1", "true", "yes", "on"}
-TOP_K = int(os.getenv("RAG_TOP_K", "10"))
+TOP_K = max(1, min(int(os.getenv("RAG_TOP_K", "6")), 8))
 DB_NAME = os.getenv("MONGO_DB_NAME", "location_tracker")
 if MONGO_URI and not os.getenv("MONGO_DB_NAME"):
     try:
@@ -301,7 +301,7 @@ def retrieve_node(state: GraphState) -> GraphState:
     events = list(
         collection().find(base_query, fields)
         .sort([("startAt", -1)])
-        .limit(min(max(TOP_K, 8), 12))
+        .limit(min(max(TOP_K, 6), 8))
     )
     print(f"[Reva RAG] MongoDB fallback returned {len(events)} events", flush=True)
     return {"events": serialize(events)}
@@ -313,11 +313,11 @@ def evidence_node(state: GraphState) -> GraphState:
     lines = []
     # Bound each record so even verbose user-generated summaries cannot overflow
     # Groq's request token budget when several events are retrieved.
-    for e in events[:12]:
+    for e in events[:8]:
         username = str(e.get("username") or "unknown")[:60]
         event_type = str(e.get("eventType") or "unknown")[:40]
         place = str(e.get("placeName") or "unknown")[:100]
-        summary = str(e.get("summary") or "")[:240]
+        summary = str(e.get("summary") or "")[:160]
         start = str(e.get("startAt") or "")[:40]
         end = str(e.get("endAt") or "")[:40]
         duration = str(e.get("durationMinutes") or 0)[:12]
