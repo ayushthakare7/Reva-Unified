@@ -1,0 +1,149 @@
+name: Build Reva Unified repository
+on:
+  push:
+    branches: [main]
+    paths: [README.md]
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout destination repository
+        uses: actions/checkout@v4
+        with:
+          path: target
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout original Reva source
+        uses: actions/checkout@v4
+        with:
+          repository: ayushthakare7/Realtime-Location-Tracker-authenticated
+          ref: main
+          path: source
+          persist-credentials: false
+      - name: Assemble unified deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -a --exclude='.git/' --exclude='.github/workflows/reva-keepalive.yml' --exclude='.github/workflows/bootstrap-unified.yml' source/ target/
+          mkdir -p target/deploy
+          cat > target/Dockerfile <<'DOCKER'
+          FROM node:22-bookworm-slim
+          ENV PYTHONUNBUFFERED=1
+          WORKDIR /app
+          RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-venv supervisor ca-certificates && rm -rf /var/lib/apt/lists/*
+          COPY package*.json ./
+          RUN npm ci --omit=dev
+          COPY mobility-service/package.json ./mobility-service/package.json
+          RUN cd mobility-service && npm install --omit=dev
+          COPY rag_service/requirements.txt ./rag_service/requirements.txt
+          RUN python3 -m venv /opt/reva-venv && /opt/reva-venv/bin/pip install --no-cache-dir --upgrade pip && /opt/reva-venv/bin/pip install --no-cache-dir -r rag_service/requirements.txt
+          COPY . .
+          RUN cp /app/deploy/supervisord.conf /etc/supervisor/conf.d/reva.conf && chmod +x /app/start-services.sh
+          EXPOSE 10000
+          CMD ["/app/start-services.sh"]
+          DOCKER
+          cat > target/start-services.sh <<'START'
+          #!/bin/sh
+          set -eu
+          exec /usr/bin/supervisord -n -c /etc/supervisor/conf.d/reva.conf
+          START
+          cat > target/deploy/supervisord.conf <<'SUPERVISOR'
+          [supervisord]
+          nodaemon=true
+          logfile=/dev/null
+          pidfile=/tmp/supervisord.pid
+          childlogdir=/tmp
+
+          [program:rag]
+          command=/opt/reva-venv/bin/python /app/rag_service/main.py
+          directory=/app/rag_service
+          autostart=true
+          autorestart=true
+          startsecs=5
+          startretries=5
+          stdout_logfile=/dev/fd/1
+          stdout_logfile_maxbytes=0
+          stderr_logfile=/dev/fd/2
+          stderr_logfile_maxbytes=0
+          environment=PORT="8001"
+
+          [program:mobility]
+          command=node /app/mobility-service/server.js
+          directory=/app/mobility-service
+          autostart=true
+          autorestart=true
+          startsecs=5
+          startretries=5
+          stdout_logfile=/dev/fd/1
+          stdout_logfile_maxbytes=0
+          stderr_logfile=/dev/fd/2
+          stderr_logfile_maxbytes=0
+          environment=PORT="3101",MONGODB_URI="%(ENV_MONGO_URI)s"
+
+          [program:main]
+          command=node /app/server.js
+          directory=/app
+          autostart=true
+          autorestart=true
+          startsecs=8
+          startretries=10
+          stdout_logfile=/dev/fd/1
+          stdout_logfile_maxbytes=0
+          stderr_logfile=/dev/fd/2
+          stderr_logfile_maxbytes=0
+          environment=PORT="10000",RAG_SERVICE_URL="http://127.0.0.1:8001",MOBILITY_SERVICE_URL="http://127.0.0.1:3101",MONGODB_URI="%(ENV_MONGO_URI)s"
+          SUPERVISOR
+          cat > target/.dockerignore <<'IGNORE'
+          .git
+          node_modules
+          **/node_modules
+          .env
+          **/.env
+          .venv
+          __pycache__
+          .pytest_cache
+          *.pyc
+          android/.gradle
+          android/build
+          IGNORE
+          cat > target/render.yaml <<'RENDER'
+          services:
+            - type: web
+              name: reva-unified
+              runtime: docker
+              plan: free
+              dockerfilePath: ./Dockerfile
+              dockerContext: .
+              healthCheckPath: /health
+              envVars:
+                - key: NODE_ENV
+                  value: production
+                - key: PORT
+                  value: "10000"
+                - key: MONGO_URI
+                  sync: false
+                - key: JWT_SECRET
+                  sync: false
+                - key: RAG_SERVICE_TOKEN
+                  sync: false
+                - key: GROQ_API_KEY
+                  sync: false
+                - key: ORS_API_KEY
+                  sync: false
+                - key: MOBILITY_CALLBACK_SECRET
+                  sync: false
+          RENDER
+          cat >> target/README.md <<'DOC'
+
+          ## Unified Render deployment
+
+          This repository runs the Node app, Mobility service, and Python RAG service inside one Docker web service. Configure secrets as Render environment variables; do not commit them. See the example env files for variable names.
+          DOC
+          rm -f target/.github/workflows/bootstrap-unified.yml
+          cd target
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Assemble Reva Node, RAG, and Mobility into one Docker service"
+          git push origin HEAD:main
