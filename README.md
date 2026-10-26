@@ -283,5 +283,3 @@ This is a separate, unmerged feature branch. It does not change `main`.
 ## Unified Render deployment
 
 This repository runs the Node app, Mobility service, and Python RAG service inside one Docker web service. Configure secrets as Render environment variables; do not commit them. See the example env files for variable names.
-
-Final unified deployment config refresh.
