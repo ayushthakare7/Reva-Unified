@@ -85,14 +85,16 @@ def embeddings():
             if _embeddings is None:
                 print(f"[Reva RAG] ONNX embedding model initialization started: {EMBEDDING_MODEL}", flush=True)
                 try:
-                    _embeddings = FastEmbedAdapter(EMBEDDING_MODEL)
-                    # Force one inference during startup of the first request so
-                    # model/runtime errors are reported before vector search.
-                    test_vector = _embeddings.embed_query("Reva embedding smoke test")
+                    candidate = FastEmbedAdapter(EMBEDDING_MODEL)
+                    # Publish the adapter only after a successful inference. A
+                    # failed warm-up must not leave a broken cached adapter behind.
+                    test_vector = candidate.embed_query("Reva embedding smoke test")
                     if len(test_vector) != 384:
                         raise RuntimeError(f"Expected 384-dimensional embeddings, got {len(test_vector)}")
+                    _embeddings = candidate
                     print("[Reva RAG] ONNX embedding model initialization completed; dimension=384", flush=True)
                 except Exception as exc:
+                    _embeddings = None
                     print(f"[Reva RAG] ONNX embedding model initialization failed: {type(exc).__name__}: {exc}", flush=True)
                     raise
     return _embeddings
@@ -540,6 +542,13 @@ if __name__ == "__main__":
     # project .env (often used by the Node server) and keep the RAG service on 8001.
     is_render = any(os.getenv(key) for key in ("RENDER", "RENDER_SERVICE_ID", "RENDER_EXTERNAL_URL"))
     port = int(os.getenv("PORT") or "8001") if is_render else 8001
+    # Warm the model before user traffic arrives. Docker builds pre-cache the
+    # model files; this moves one-time runtime initialization off the first ask.
+    try:
+        embeddings()
+    except Exception as exc:
+        # Keep the API available for diagnostics and deterministic MongoDB fallback.
+        print(f"[Reva RAG] startup embedding warm-up failed; semantic search will retry on demand: {type(exc).__name__}: {exc}", flush=True)
     server = ThreadingHTTPServer((host, port), RevaRAGHandler)
     print(f"Reva RAG service listening on {host}:{port}", flush=True)
     try:
